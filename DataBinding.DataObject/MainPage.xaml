@@ -1,0 +1,55 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DataBinding.DataObject.MainPage">
+
+    <ScrollView>
+        <Grid Margin="16">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <VerticalStackLayout Grid.Row="0" Grid.Column="0" >
+                <Label 
+         HorizontalOptions="Start" 
+         Text="Conteo:"
+         TextColor="Black" 
+         FontSize="Medium">
+                </Label>
+
+                <Border Stroke="Gray" Margin="0,24,0,36">
+
+                    <Label
+             HorizontalOptions="Center" 
+             Margin="0,24"
+             FontSize="Large" 
+             TextColor="Black"
+             FontAttributes="Bold" 
+             Text="{Binding Path=Conteo}"
+             
+             />
+                </Border>
+
+
+            </VerticalStackLayout>
+
+            <HorizontalStackLayout Grid.Row="1" Grid.Column="0" HorizontalOptions="Center" Spacing="32">
+                <Button Text="Contar" 
+         WidthRequest="130"
+         FontSize="Medium" 
+         Clicked="Button_Clicked" />
+
+
+                <Button Text="Reiniciar"
+         
+         WidthRequest="130" 
+         FontSize="Medium"
+         Clicked="Button_Clicked_1" />
+
+            </HorizontalStackLayout>
+
+        </Grid>
+
+    </ScrollView>
+
+</ContentPage>
