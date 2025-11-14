@@ -1,31 +1,70 @@
+using System.Collections.ObjectModel;
 using DataBinding.Colección.Models;
 
 namespace DataBinding.Colección.Views;
 
 public partial class MainPage : ContentPage
 {
-	private List<OrigenDePaquete> _origenes;
-
+	public ObservableCollection<OrigenDePaquete> Origenes{ get; }
+    private OrigenDePaquete? _origenseleccionado=null;
+    private string? _nombreDelOrigen=string.Empty;
+    private string? _rutaDelOrigen=string.Empty ;
+    public OrigenDePaquete? OrigenSeleccionado {  
+        get=>_origenseleccionado;
+        set {
+            if (_origenseleccionado!=value) 
+            { 
+                _origenseleccionado = value; 
+                OnPropertyChanged(nameof(OrigenSeleccionado));
+            } 
+        } 
+    }
+    public string NombreDelOrigen
+    {
+        get => _nombreDelOrigen;
+        set
+        {
+            if (_nombreDelOrigen != value)
+            {
+                _nombreDelOrigen = value!;
+                OnPropertyChanged(nameof(NombreDelOrigen));
+            }
+        }
+    }
+    public string RutaDelOrigen
+    {
+        get => _rutaDelOrigen; 
+        set
+        {
+            if (_rutaDelOrigen != value)
+            {
+                _rutaDelOrigen = value!;
+                OnPropertyChanged(nameof(RutaDelOrigen));
+            }
+        }
+    }
 	public MainPage()
 	{      
 		InitializeComponent();
-        OrigenDePaquete? origenSeleccionado=null;
-        _origenes =new List<OrigenDePaquete>();
-		CargarDatos();
-        OrigenesListView.ItemsSource= _origenes;
-        if (_origenes.Count > 0)
-        {
-            origenSeleccionado = _origenes[0];
-        }
-        OrigenesListView.ItemsSource = _origenes;
-        OrigenesListView.SelectedItem = origenSeleccionado;
-    }
-   
+        OrigenSeleccionado =null;
 
+        Origenes = new ObservableCollection<OrigenDePaquete>();
+		CargarDatos();
+
+        BindingContext = this;
+
+        OrigenesListView.ItemsSource= Origenes;
+        if (Origenes.Count > 0)
+        {
+            OrigenSeleccionado = Origenes[0];
+        }
+        //OrigenesListView.ItemsSource = _origenes;
+        //OrigenesListView.SelectedItem = origenSeleccionado;
+    }
 	private void CargarDatos() {
 
-        _origenes.Add(new OrigenDePaquete { Nombre = "nuget.org", Origen = "https://api.nuget.org/v3/index.json", EstaHabilitado = true });
-        _origenes.Add(new OrigenDePaquete { Nombre = "Microsoft Visual Studio Offline Packages", Origen = @"C:\Program Files(x86)\Microsoft SDKs\NugetPackages", EstaHabilitado = true });
+        Origenes.Add(new OrigenDePaquete { Nombre = "nuget.org", Origen = "https://api.nuget.org/v3/index.json", EstaHabilitado = true });
+        Origenes.Add(new OrigenDePaquete { Nombre = "Microsoft Visual Studio Offline Packages", Origen = @"C:\Program Files(x86)\Microsoft SDKs\NugetPackages", EstaHabilitado = false });
         
 	}
 
@@ -34,28 +73,24 @@ public partial class MainPage : ContentPage
         {
          Nombre = "OrigenDePaquete", Origen = "URL o ruta", EstaHabilitado = false, 
         };
-        _origenes.Add(origen);
-        OrigenesListView.ItemsSource = null;
-        OrigenesListView.ItemsSource = _origenes;
-        OrigenesListView.SelectedItem = origen;
+        Origenes.Add(origen);
+        OrigenSeleccionado = origen;
     }
     private void OnDeleteButtonClicked(object sender, EventArgs e)
     {
-
-        OrigenDePaquete seleccionado = (OrigenDePaquete) OrigenesListView.SelectedItem;
-        if (seleccionado !=null)
+        if (OrigenSeleccionado !=null)
         {
-            var indice= _origenes.IndexOf(seleccionado);
-            OrigenDePaquete nuevoSeleccionado;
-            if (_origenes.Count>1) {
+            var indice= Origenes.IndexOf(OrigenSeleccionado);
+            OrigenDePaquete? nuevoSeleccionado;
+            if (Origenes.Count>1) {
                 //hay mas de un elemento
-                if (indice < _origenes.Count-1) {
-                    nuevoSeleccionado= _origenes[indice+1];
+                if (indice < Origenes.Count-1) {
+                    nuevoSeleccionado= Origenes[indice+1];
                 }
                 else
                 {
                     //El elemento seleccionado es el utlimo 
-                    nuevoSeleccionado=_origenes[indice-1];
+                    nuevoSeleccionado=Origenes[indice-1];
                 }
             }
             else
@@ -63,39 +98,36 @@ public partial class MainPage : ContentPage
                 //Solo hay un elemento
                 nuevoSeleccionado=null;
             }
-            _origenes.Remove(seleccionado);
-            OrigenesListView.ItemsSource = null;
-            OrigenesListView.ItemsSource = _origenes;
-            OrigenesListView.SelectedItem = nuevoSeleccionado;
+            Origenes.Remove(OrigenSeleccionado);
+            OrigenSeleccionado = nuevoSeleccionado;
+            //OrigenesListView.ItemsSource = null;
+            //OrigenesListView.ItemsSource = _origenes;
+            //OrigenesListView.SelectedItem = nuevoSeleccionado;
         }
     }
 
     private void OrigenesListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        OrigenDePaquete origenSeleccionado =
-        (OrigenDePaquete)OrigenesListView.SelectedItem;
-        if (origenSeleccionado !=null)
+        NombreDelOrigen = string.Empty;
+        RutaDelOrigen = string.Empty;
+
+        if (OrigenSeleccionado !=null)
         {
-            NombreEntry.Text = origenSeleccionado.Nombre;
-            OrigenEntry.Text = origenSeleccionado.Origen;
+            NombreDelOrigen = OrigenSeleccionado.Nombre;
+            RutaDelOrigen = OrigenSeleccionado.Origen;
         }
         else
-        { 
-        NombreEntry.Text = string.Empty;
-        OrigenEntry.Text = string.Empty;
+        {
+            NombreDelOrigen = string.Empty;
+            RutaDelOrigen = string.Empty;
         }
     }
 
     private void Actualizar(object sender, EventArgs e)
     {
-        OrigenDePaquete? origenSeleccionado =
-            OrigenesListView.SelectedItem as OrigenDePaquete;
-        if (origenSeleccionado != null) {
-            origenSeleccionado.Nombre = NombreEntry.Text;
-            origenSeleccionado.Origen = OrigenEntry.Text;
-            OrigenesListView.ItemsSource = null;
-            OrigenesListView.ItemsSource = _origenes;
-            OrigenesListView.SelectedItem = origenSeleccionado;
+        if (OrigenSeleccionado != null) {
+          OrigenSeleccionado.Nombre= NombreDelOrigen;
+          OrigenSeleccionado.Origen = RutaDelOrigen;
         }
     }
 }
